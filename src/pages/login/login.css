@@ -1,0 +1,41 @@
+.loginContainer{
+
+
+background-color: rgb(255, 255, 255);
+justify-content: center;
+align-items: center;
+justify-items: center;
+width: 30rem;
+height: 18rem;
+
+margin: auto;
+border-radius: 10px;
+box-shadow: 0px 6px 15px -3px rgba(130, 130, 130, 0.53);
+}
+
+.changePasswordContainer{
+
+
+background-color: rgb(255, 255, 255);
+justify-content: center;
+align-items: center;
+justify-items: center;
+width: 30rem;
+height: 38rem;
+margin: auto;
+border-radius: 10px;
+box-shadow: 0px 6px 15px -3px rgba(130, 130, 130, 0.53);
+}
+
+.loginForm{
+
+    margin-left: 5rem !important ;
+    margin-top: 5rem;
+    padding-top: 0rem;
+}
+
+body{
+
+background-color:'white';
+
+}
