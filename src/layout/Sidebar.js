@@ -31,7 +31,9 @@ const Sidebar = () => {
 
     getItem("Items", "/items", <TeamOutlined />),
 
-    getItem("Report", "/summary", <LineChartOutlined />),
+    getItem("Report By Employee", "/summary", <LineChartOutlined />),
+
+    getItem("Monthly Report", "/monthly-summary", <LineChartOutlined />),
 
 
   ];

@@ -1,10 +1,12 @@
-// src/pages/SummaryPage.js
+// src/pages/MonthlySummaryPage.js
 import React, { useState } from 'react';
 import { Card } from 'antd';
 import EmployeeSummaryForm from '../components/Summary/EmployeeSummaryForm';
 import EmployeeSummary from '../components/Summary/EmployeeSummary';
+import MonthlySummaryForm from 'components/Summary/MonthlySummaryForm';
+import MonthlySummary from 'components/Summary/MonthlySummary';
 
-const SummaryPage = () => {
+const MonthlySummaryPage = () => {
     const [employeeId, setEmployeeId] = useState(null);
     const [dateRange, setDateRange] = useState(null);
 
@@ -14,11 +16,11 @@ const SummaryPage = () => {
     };
 
     return (
-        <Card title="Employee Summary">
-            <EmployeeSummaryForm onFinish={handleFinish} />
-            {employeeId && dateRange && <EmployeeSummary employeeId={employeeId} dateRange={dateRange} />}
+        <Card title="Monthly Summary">
+            <MonthlySummaryForm onFinish={handleFinish} />
+            {dateRange && <MonthlySummary dateRange={dateRange} />}
         </Card>
     );
 };
 
-export default SummaryPage;
+export default MonthlySummaryPage;

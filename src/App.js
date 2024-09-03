@@ -8,8 +8,10 @@ import Completelayout from "./layout/completeLayout";
 import LoginLayout from "./layout/loginLayout";
 import DashBoard from "pages/dashboard";
 import AuthVerify from "utils/TokenVerify";
-import SummaryPage from "services/SummaryService";
 import ItemsPage from "pages/ItemPage";
+import MonthlySummary from "components/Summary/MonthlySummary";
+import MonthlySummaryPage from "pages/MonthlySummaryPage";
+import SummaryPage from "pages/SummaryPage";
 
 
 const App = () => {
@@ -45,6 +47,9 @@ const App = () => {
               <Route
                 exact
               path="/summary" element={<SummaryPage/>} />
+              <Route
+                exact
+              path="/monthly-summary" element={<MonthlySummaryPage/>} />
 
             
             </Route>
