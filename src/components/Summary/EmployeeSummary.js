@@ -1,6 +1,7 @@
+// src/components/EmployeeSummary.js
 import React, { useEffect, useState } from 'react';
 import { Table, Typography } from 'antd';
-import axios from "axios/axios";
+import { fetchEmployeeSummary } from 'services/SummaryService';
 
 const { Title } = Typography;
 
@@ -10,38 +11,9 @@ const EmployeeSummary = ({ employeeId, dateRange }) => {
     const [totalPrice, setTotalPrice] = useState(0);
 
     useEffect(() => {
-        const fetchSummaryData = async () => {
+        const loadSummaryData = async () => {
             try {
-                var token = JSON.parse(localStorage.getItem("token")); // Get the token from local storage
-                if (!token) {
-                    console.error('No token found in local storage');
-                    return;
-                }
-
-                // Assume dateRange is an array with two moments: [startDate, endDate]
-                const [startDate, endDate] = dateRange;
-
-                // Check if dateRange and dates are valid
-                if (!startDate || !endDate) {
-                    console.error('Invalid dateRange:', dateRange);
-                    return;
-                }
-
-                // Format dates as needed, e.g., 'YYYY-MM-DD'
-                const formattedStartDate = startDate.format('YYYY-MM-DD');
-                const formattedEndDate = endDate.format('YYYY-MM-DD');
-
-                const response = await axios.get(`/api/orders/reports/${employeeId}/items`, {
-                    params: {
-                        startDate: formattedStartDate,
-                        endDate: formattedEndDate,
-                    },
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                const summaryData = response.data; // Assign the fetched data
+                const summaryData = await fetchEmployeeSummary(employeeId, dateRange);
                 const aggregatedData = aggregateData(summaryData);
 
                 setSummary(summaryData);
@@ -50,13 +22,12 @@ const EmployeeSummary = ({ employeeId, dateRange }) => {
                 // setSummary(aggregatedData);
                 // calculateTotals(aggregatedData);
             } catch (error) {
-                console.error('API call failed:', error.response ? error.response.data : error.message);
-                // Handle the error (e.g., show a message to the user)
+                console.error('API call failed:', error.message);
             }
         };
 
         if (employeeId && dateRange) {
-            fetchSummaryData(); // Call the async function
+            loadSummaryData();
         }
     }, [employeeId, dateRange]);
 
@@ -65,12 +36,12 @@ const EmployeeSummary = ({ employeeId, dateRange }) => {
             const key = `${item.userId}-${item.itemId}`; // Unique key based on userId and itemId
 
             if (!acc[key]) {
-                acc[key] = { 
-                    userId: item.userId, 
-                    itemId: item.itemId, 
-                    itemName: item.itemName, 
-                    price: item.price, 
-                    quantity: parseFloat(item.quantity) // Initialize quantity
+                acc[key] = {
+                    userId: item.userId,
+                    itemId: item.itemId,
+                    itemName: item.itemName,
+                    price: item.price,
+                    quantity: parseFloat(item.quantity), // Initialize quantity
                 };
             } else {
                 acc[key].quantity += parseFloat(item.quantity); // Aggregate quantity
@@ -79,8 +50,7 @@ const EmployeeSummary = ({ employeeId, dateRange }) => {
             return acc;
         }, {});
 
-        // Convert the aggregated data object back to an array
-        return Object.values(aggregated);
+        return Object.values(aggregated); // Convert the aggregated data object back to an array
     };
 
     const calculateTotals = (data) => {
@@ -109,6 +79,12 @@ const EmployeeSummary = ({ employeeId, dateRange }) => {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
+        },
+        {
+            title: 'Order Date', // Updated the title from 'Ordered Date' to 'Date'
+            dataIndex: 'created_at',
+            key: 'created_at',
+            render: (text) => new Date(text).toLocaleDateString(), // Format the date as 'MM/DD/YYYY'
         },
         {
             title: 'Total',

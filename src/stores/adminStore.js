@@ -18,17 +18,11 @@ const cafeteriaStore = (set) => ({
 
     updateItem: (editData) => {
         set((state) => ({
-            items: state.items.map((item) => {
-                if (item._id === editData._id) {
-                    return {
-                        ...item,
-                        name: editData.name,
-                        description: editData.description,
-                    };
-                } else {
-                    return item;
-                }
-            }),
+            items: state.items.map((item) =>
+                item.id === editData.id
+                    ? { ...item, ...editData }
+                    : item
+            ),
         }));
     },
 

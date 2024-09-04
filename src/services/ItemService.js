@@ -1,6 +1,6 @@
 // src/services/ItemService.js
 import { message } from 'antd';
-import axios from 'axios';
+import axios from "axios/axios";
 
 class ItemService {
     static getItems() {
@@ -38,7 +38,14 @@ class ItemService {
     }
 
     static editItem(id, data) {
-        return axios.put(`/api/items/${id}`, data);
+      console.log('data: ', data);
+      console.log('id: ', id);
+      const token = JSON.parse(localStorage.getItem("token"));
+        return axios.put(`/api/items/${id}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
     }
 }
 

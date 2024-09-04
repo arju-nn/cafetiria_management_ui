@@ -1,36 +1,45 @@
 import { Button, Form, Input, InputNumber, Space } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import getCurrentUser from "services/get-user";
 
 const ItemsForm = ({
   submitHandler,
   loadings,
-  name,
-  description,
   editData,
-  editHandler,
   handleCancel,
 }) => {
   const [form] = Form.useForm();
-  const onFinish = (values) => {
-    console.log(values);
-    if (!editData) {
-      const currentUser = getCurrentUser();
-      console.log({ currentUser });
-      // values.driverId = currentUser.user._id;
-      // values.currentLocation = [12, 45];
 
+  useEffect(() => {
+    // Set form fields when editData is available
+    if (editData) {
+      form.setFieldsValue({
+        name: editData.name,
+        price: editData.price,
+        description: editData.description,
+      });
+    } else {
+      form.resetFields(); // Reset form when adding a new item
+    }
+  }, [editData, form]);
+
+  const onFinish = (values) => {
+    const currentUser = getCurrentUser();
+
+    if (!editData) {
+      // Add new item
+      values.currentUser = currentUser;
       submitHandler(values, form);
     } else {
+      // Edit existing item
       values._id = editData._id;
-      editHandler(values, form);
+      submitHandler(values, form);
     }
   };
 
   return (
     <Form
       form={form}
-      key={editData?._id}
       name="basic"
       initialValues={{
         remember: true,
@@ -41,9 +50,6 @@ const ItemsForm = ({
       autoComplete="off"
     >
       <Form.Item
-        labelCol={{ span: 24, offset: 0 }}
-        labelAlign="left"
-       
         label="Item Name"
         name="name"
         rules={[
@@ -53,11 +59,10 @@ const ItemsForm = ({
           },
         ]}
       >
-        <Input  placeholder="Enter Item Name"/>
+        <Input placeholder="Enter Item Name" />
       </Form.Item>
+
       <Form.Item
-        labelCol={{ span: 24, offset: 0 }}
-        labelAlign="left"
         label="Price"
         name="price"
         rules={[
@@ -66,40 +71,30 @@ const ItemsForm = ({
             message: "Please Enter Price!",
           },
           {
-            type: 'number',
+            type: "number",
             min: 0,
-            message: 'Price must be a positive number!',
+            message: "Price must be a positive number!",
           },
         ]}
       >
         <InputNumber
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
           placeholder="Enter price"
           min={0}
           step={0.01}
         />
       </Form.Item>
 
-      <Form.Item
-        wrapperCol={{
-          offset: 18,
-          span: 10,
-        }}
-      >
+      <Form.Item>
         <Space size={8}>
           <Button onClick={handleCancel}>Cancel</Button>
-          {editData ? (
-            <Button type="primary" htmlType="submit" loading={loadings}>
-              Confirm
-            </Button>
-          ) : (
-            <Button type="primary" htmlType="submit" loading={loadings}>
-              Submit
-            </Button>
-          )}
+          <Button type="primary" htmlType="submit" loading={loadings}>
+            {editData ? "Confirm" : "Submit"}
+          </Button>
         </Space>
       </Form.Item>
     </Form>
   );
 };
+
 export default ItemsForm;

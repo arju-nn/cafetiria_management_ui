@@ -25,18 +25,12 @@ const ItemsPage = ({ currentUser }) => {
   const setItems = useItemStore((state) => state.setItems);
   const addItem = useItemStore((state) => state.addItem);
   const updateItem = useItemStore((state) => state.updateItem);
-  const [refreshLoading, setRefreshLoading] = useState(false);  
+  const [refreshLoading, setRefreshLoading] = useState(false);
 
   // Notification
-  const ItemAdded = (msg) => {
-    message.success(msg);
-  };
-  const editSuccessful = (msg) => {
-    message.success(msg);
-  };
-  const errorMsg = (msg) => {
-    message.error(msg);
-  };
+  const ItemAdded = (msg) => message.success(msg);
+  const editSuccessful = (msg) => message.success(msg);
+  const errorMsg = (msg) => message.error(msg);
 
   const addNewItem = () => {
     setEditData(null);
@@ -49,16 +43,32 @@ const ItemsPage = ({ currentUser }) => {
   };
 
   const toggleEditMode = (id) => {
-    const itemToEdit = items.find((item) => item._id === id);
+    const itemToEdit = items.find((item) => item.id === id);
     setEditData(itemToEdit);
     setVisible(true);
   };
 
   const submitHandler = async (values) => {
-    // const token = JSON.parse(localStorage.getItem("token"));
-    const  response = await ItemService.addItem(values);
-    addItem(response);
-    ItemAdded("Item added successfully");
+    try {
+      let response;
+      if (editData) {
+        console.log('editData: ', editData);
+        // Update existing item
+        response = await ItemService.editItem(editData.id, values);
+        console.log('response: ', response);
+        updateItem(response.data); // Update the item in Zustand store
+        editSuccessful("Item updated successfully");
+      } else {
+        // Add new item
+        response = await ItemService.addItem(values);
+        addItem(response); // Add the new item to Zustand store
+        ItemAdded("Item added successfully");
+      }
+    } catch (error) {
+      errorMsg(error.response?.data?.message || "Operation failed");
+    } finally {
+      setVisible(false); // Close the modal after operation
+    }
   };
 
   useEffect(() => {
@@ -113,7 +123,9 @@ const ItemsPage = ({ currentUser }) => {
             onClick={refresh}
             key="1"
             type="dashed"
-          ></Button>,
+          >
+            Refresh
+          </Button>,
         ]}
       />
 
@@ -143,8 +155,8 @@ const ItemsPage = ({ currentUser }) => {
         <ItemsForm
           submitHandler={submitHandler}
           loadings={loadings}
-          editData={editData}
           handleCancel={handleCancel}
+          editData={editData} // Corrected prop name
         />
       </Modal>
     </div>

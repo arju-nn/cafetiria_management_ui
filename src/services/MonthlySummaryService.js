@@ -1,26 +1,39 @@
-// src/pages/MonthlySummaryPage.js
-import React, { useState } from 'react';
-import { Card } from 'antd';
-import EmployeeSummaryForm from '../components/Summary/EmployeeSummaryForm';
-import EmployeeSummary from '../components/Summary/EmployeeSummary';
-import MonthlySummaryForm from 'components/Summary/MonthlySummaryForm';
-import MonthlySummary from 'components/Summary/MonthlySummary';
+// src/services/reportService.js
+import axios from "axios/axios";
 
-const MonthlySummaryPage = () => {
-    const [employeeId, setEmployeeId] = useState(null);
-    const [dateRange, setDateRange] = useState(null);
+export const fetchMonthlySummary = async (dateRange) => {
+    try {
+        const token = JSON.parse(localStorage.getItem('token')); // Get the token from local storage
+        if (!token) {
+            throw new Error('No token found in local storage');
+        }
 
-    const handleFinish = ({ employeeId, dateRange }) => {
-        setEmployeeId(employeeId);
-        setDateRange(dateRange);
-    };
+        // Assume dateRange is an array with two moments: [startDate, endDate]
+        const [startDate, endDate] = dateRange;
 
-    return (
-        <Card title="Monthly Summary">
-            <MonthlySummaryForm onFinish={handleFinish} />
-            {dateRange && <MonthlySummary dateRange={dateRange} />}
-        </Card>
-    );
+        // Check if dateRange and dates are valid
+        if (!startDate || !endDate) {
+            throw new Error('Invalid dateRange');
+        }
+
+        // Format dates as needed, e.g., 'YYYY-MM-DD'
+        const formattedStartDate = startDate.format('YYYY-MM-DD');
+        const formattedEndDate = endDate.format('YYYY-MM-DD');
+
+        // Fetch data for all employees without filtering by employeeId
+        const response = await axios.get(`/api/orders/reports/monthly`, {
+            params: {
+                startDate: formattedStartDate,
+                endDate: formattedEndDate,
+            },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return response.data; // Return the fetched data
+    } catch (error) {
+        // Propagate the error to the calling function
+        throw new Error(error.response ? error.response.data : error.message);
+    }
 };
-
-export default MonthlySummaryPage;
